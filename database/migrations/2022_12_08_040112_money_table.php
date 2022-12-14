@@ -14,12 +14,12 @@ return new class extends Migration
     public function up()
     {
         Schema::create('layouts', function (Blueprint $table) {
-            $table->id('');
-            $table->integer('NIS',8)->unique();
-            $table->string('Nama');
+            $table->id();
+            $table->integer('nis')->unique();
+            $table->string('nama');
             $table->string('rayon');
-            $table->string('class');
-            $table->integer('money')->nullable();
+            $table->string('rombel');
+            $table->integer('uang')->nullable();
             $table->timestamps();
         });
     }

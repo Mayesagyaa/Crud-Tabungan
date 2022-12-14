@@ -14,9 +14,9 @@ class StudentController extends Controller
      */
     public function index()
     {
-        $student = Student::get();
+        $students = Student::get();
 
-        return view('dashboard')->with ('students', $student);
+        return view('tabungan.index',compact('students'));
     }
 
 
@@ -30,15 +30,15 @@ class StudentController extends Controller
     {
         $request->validate([
             'nis' =>'required',
-            'name' => 'required',
+            'nama' => 'required',
             'rayon' => 'required',
-            'money' => 'required',
+            'rombel' =>'required',
         ]);
 
         Student::create($request->all());
 
-        return redirect()->route('dashboard')
-                     ->with('success','Berhasil Membuat Money Safe'); 
+        return redirect()->route('index')
+                     ->with('success','Berhasil Membuat Money Safe');
     }
 
 
@@ -50,8 +50,8 @@ class StudentController extends Controller
      */
     public function edit($id)
     {
-        $student=$Student::where('id', $id)->first();
-        return view('edit')->with('student',$student);
+        $student=Student::where('id', $id)->first();
+        return view('tabungan.edit')->with('student',$student);
     }
 
     /**
@@ -64,52 +64,55 @@ class StudentController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'nis' =>'required|min:8',
-            'name' =>'required',
+            'nis' =>'required',
+            'nama' =>'required',
             'rayon' =>'required',
-            'method' =>'required',
-            'money' =>'required',
+            'rombel' =>'required',
+            'uang' =>'required',
         ]);
 
         $student = Student::where('id', $id)->first();
 
-        if($request->method == 'Add Money') {
-            $totalMoney = $student['money'] + $request->money;
+        if($request->action == 'add') {
+            $totaluang = $student['uang'] + $request->uang;
             $student->update([
-                'nis'=> $request->nis, 
-                'name'=> $request->name, 
+                'nis'=> $request->nis,
+                'nama'=> $request->nama,
                 'rayon'=> $request->rayon,
-                'money'=> $totalMoney
+                'rombel'=> $request->rombel,
+                'uang'=> $totaluang
             ]);
 
-            return redirect()->route('dashboard')
+            return redirect()->route('index')
                         ->with('add', 'Berhasil Menambah Uang!');
-        } elseif($request->method == 'Take Money') {
-            if ($student['money'] <$request->money){
-                return redirect ()->route('dashboard')
+        } elseif($request->action == 'take') {
+            if ($student['uang'] < $request->uang){
+                return redirect ()->route('index')
                         -> with ('failed', 'Uang Anda Tidak Mencukupi!');
             } else{
-                $totalMoney= $student ['money'] - $request->mone;
+                $totaluang= $student['uang'] - $request->uang;
                 $student->update([
-                    'nis'=> $request->nis, 
-                    'name'=> $request->name, 
+                    'nis'=> $request->nis,
+                    'nama'=> $request->nama,
                     'rayon'=> $request->rayon,
-                    'money'=> $totalMoney
+                    'rombel'=> $request->rombel,
+                    'uang'=> $totaluang
                 ]);
-                return redirect ()->route('dashboard ')
+                return redirect ()->route('index')
                                     ->with ('take', 'Berhasil Mengambil!');
             }
         }
 
         $student->update([
-            'nis'=> $request->nis, 
-            'name'=> $request->name, 
+            'nis'=> $request->nis,
+            'nama'=> $request->nama,
             'rayon'=> $request->rayon,
+            'rombel'=> $request->rombel,
         ]);
 
-        return redirect()->route('dashboard')
+        return redirect()->route('index')
                             ->with('edit', 'Berhasil edit data');
-        
+
     }
 
     /**
@@ -120,8 +123,8 @@ class StudentController extends Controller
      */
     public function destroy($id)
     {
-        $Student::Where('id', '$id') ->delete();
-        return redirect()->route('dashboard')
+        Student::Where('id', $id) ->delete();
+        return redirect()->route('index')
                         ->with('delete','Berhasil menghapus data');
     }
 }
